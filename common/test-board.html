@@ -1,0 +1,33 @@
+<!DOCTYPE>
+<html>
+
+<head>
+    <title>Test board</title>
+    <style>
+        #boardContainer { min-height: 500px; }
+    </style>
+</head>
+
+<body>
+    <div id="boardContainer"></div>
+    <script src="/node_modules/systemjs/dist/system.js"></script>
+    <script> 
+        SystemJS.config({baseURL: '/'});
+        SystemJS.import('common/Board2D.js').then((exported)=>{
+            let idxColor = 0, myboard;
+            myboard = new exported.Board2D('boardContainer', 10, 10);
+            myboard.colors.push("#222");
+            myboard.colors.push("#bbb");
+            for (let i = 0; i < 10; i++) {
+                for (let j = 0; j < 10; j++) {
+                    myboard.blocks[i][j].setIndexColor(idxColor);
+                    idxColor = idxColor ? 0 : 1;
+                }
+                idxColor = idxColor ? 0 : 1;
+            }
+            myboard.draw();
+        })
+    </script>
+</body>
+
+</html>

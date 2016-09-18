@@ -1,0 +1,20 @@
+<!DOCTYPE>
+<html>
+
+<head>
+    <title>Sandpile</title>
+    <style>
+        #boardContainer { min-height: 500px; }
+    </style>
+</head>
+
+<body>
+    <div id="boardContainer"></div>
+    <script src="/node_modules/systemjs/dist/system.js"></script>
+    <script> 
+        SystemJS.config({baseURL: '/'});
+        SystemJS.import('sandpile/TestSandpile.js');
+    </script>
+</body>
+
+</html>
