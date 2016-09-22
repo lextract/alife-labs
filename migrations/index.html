@@ -3,13 +3,17 @@
 
 <head>
     <title>Migrations</title>
+    <style>
+        #boardContainer { min-height: 500px; }
+    </style>
 </head>
 
 <body>
-    <script src="node_modules/systemjs/dist/system.js"></script>
+    <div id="boardContainer"></div>
+    <script src="/node_modules/systemjs/dist/system.js"></script>
     <script> 
         SystemJS.config({baseURL: '/'});
-        //SystemJS.import('main.js');
+        SystemJS.import('migrations/TestMigrations.js');
     </script>
 </body>
 
