@@ -3,6 +3,7 @@ const LandCanvas_1 = require('./LandCanvas');
 const LandPlot_1 = require('./LandPlot');
 const Migrant_1 = require('./Migrant');
 const alphaFactors = [1, 0.9, 0.7, 0.4, 0.1];
+let simulationSpeed = 100;
 class LandMigrations {
     constructor(containerId, xPlots, yPlots, beings) {
         this.containerId = containerId;
@@ -25,7 +26,7 @@ class LandMigrations {
                 y = Math.floor(Math.random() * this.yPlots);
                 plot = this.plots[x][y];
             } while (plot.isBusy);
-            this.migrants.push(new Migrant_1.Migrant(x, y, this.land));
+            this.migrants.push(new Migrant_1.Migrant(x, y, this));
             plot.isBusy = true;
         }
     }
@@ -34,12 +35,34 @@ class LandMigrations {
         this.initializeMigrants();
         this.land.draw();
     }
+    simulate(nSteps) {
+        this.land.drawFunctions.splice(0, 2);
+        this.land.drawFunctions.push(ctx => {
+            this.migrants.forEach(mig => mig.advance(ctx));
+        });
+        let updateGenerator;
+        let instance = this;
+        function* drawState() {
+            for (let i = 0; i < nSteps; i++) {
+                instance.migrants.forEach(mig => { mig.perceive(); });
+                instance.land.draw();
+                setTimeout(() => {
+                    updateGenerator.next();
+                }, simulationSpeed);
+                yield;
+            }
+        }
+        updateGenerator = drawState();
+        updateGenerator.next();
+    }
     drawPlots(ctx) {
-        console.log(ctx);
         this.plots.forEach(arrPlot => arrPlot.forEach(item => item.draw(ctx)));
     }
     drawMigrants(ctx) {
         this.migrants.forEach(mig => mig.draw(ctx));
+    }
+    getPlot(x, y) {
+        return this.plots[x][y];
     }
     initializePlots() {
         this.plots = new Array(this.xPlots);
@@ -60,9 +83,9 @@ class LandMigrations {
                 return false;
             else {
                 if (dx > dy)
-                    plot.levelResources = alphaFactors[dx] * item.alpha;
+                    plot.levelResources = Math.round(alphaFactors[dx] * item.alpha);
                 else
-                    plot.levelResources = alphaFactors[dy] * item.alpha;
+                    plot.levelResources = Math.round(alphaFactors[dy] * item.alpha);
                 return true;
             }
         });

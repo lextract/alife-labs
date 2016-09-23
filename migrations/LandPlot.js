@@ -13,11 +13,17 @@ class LandPlot {
         this.y = y;
         this.land = land;
         this.isBusy = false;
-        this.levelResources = 0;
+        this._levelResources = 0;
         this.indexColor = 0;
     }
-    draw(ctx) {
+    get levelResources() {
+        return this._levelResources;
+    }
+    set levelResources(value) {
+        this._levelResources = value;
         this.updateState();
+    }
+    draw(ctx) {
         ctx.fillStyle = exports.PLOT_COLORS[this.indexColor];
         let x = this.x * this.land.plotMeasures.width, y = this.y * this.land.plotMeasures.height, w = this.land.plotMeasures.width, h = this.land.plotMeasures.height;
         ctx.fillRect(x, y, w, h);

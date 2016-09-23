@@ -11,16 +11,22 @@ export const PLOT_COLORS = [
 
 export class LandPlot {
     isBusy: boolean = false;
-    levelResources: number = 0;
-    indexColor: number = 0;
+    private _levelResources: number = 0;
+    private indexColor: number = 0;
     constructor(
         public x: number,
         public y: number,
         private land: LandCanvas
     ) {
     }
-    draw(ctx: CanvasRenderingContext2D) {
+    get levelResources(){
+        return this._levelResources;
+    }
+    set levelResources(value: number){
+        this._levelResources = value;
         this.updateState();
+    }
+    draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = PLOT_COLORS[this.indexColor];
         let x = this.x * this.land.plotMeasures.width,
             y = this.y * this.land.plotMeasures.height,
@@ -28,7 +34,7 @@ export class LandPlot {
             h = this.land.plotMeasures.height;
         ctx.fillRect(x, y, w, h);
     }
-    updateState() {
+    private updateState() {
         let idx = (PLOT_COLORS.length - 1) * this.levelResources / this.land.plotMeasures.maxLevelResources;
         this.indexColor = Math.round(idx);
     }

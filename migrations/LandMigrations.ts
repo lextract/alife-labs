@@ -3,36 +3,37 @@ import {LandPlot} from './LandPlot';
 import {Migrant} from './Migrant';
 
 const alphaFactors = [1, 0.9, 0.7, 0.4, 0.1];
+let simulationSpeed = 100;
 
 export class LandMigrations {
     alpha: number = 0;
     land: LandCanvas;
-    plots: Array<Array<LandPlot>>;
+    private plots: LandPlot[][];
     alphaResources: Array<AlphaResource> = [];
     migrants: Array<Migrant>;
     constructor(
         private containerId: string,
-        private xPlots: number,
-        private yPlots: number,
+        public xPlots: number,
+        public yPlots: number,
         private beings: number
     ) {
         this.land = new LandCanvas(containerId, xPlots, yPlots);
-        this.land.drawFunctions.push(ctx => {this.drawPlots(ctx)});
-        this.land.drawFunctions.push(ctx =>{this.drawMigrants(ctx)});
+        this.land.drawFunctions.push(ctx => { this.drawPlots(ctx) });
+        this.land.drawFunctions.push(ctx => { this.drawMigrants(ctx) });
     }
 
-    private initializeMigrants(){
+    private initializeMigrants() {
         this.migrants = new Array(this.beings);
-        for (let i=0; i < this.beings; i++){
+        for (let i = 0; i < this.beings; i++) {
             let plot: LandPlot;
-            let x =0,y=0;
-            do{
+            let x = 0, y = 0;
+            do {
                 x = Math.floor(Math.random() * this.xPlots);
                 y = Math.floor(Math.random() * this.yPlots);
                 plot = this.plots[x][y];
             }
-            while(plot.isBusy)
-            this.migrants.push(new Migrant(x,y,this.land));
+            while (plot.isBusy)
+            this.migrants.push(new Migrant(x, y, this));
             plot.isBusy = true;
         }
     }
@@ -43,13 +44,37 @@ export class LandMigrations {
         this.land.draw();
     }
 
+    simulate(nSteps) {
+        this.land.drawFunctions.splice(0,2);
+        this.land.drawFunctions.push(ctx=>{
+            this.migrants.forEach(mig => mig.advance(ctx));
+        })
+        let updateGenerator;
+        let instance = this;
+        function* drawState() {
+            for (let i = 0; i < nSteps; i++) {
+                instance.migrants.forEach(mig => {mig.perceive()});
+                instance.land.draw();
+                setTimeout(() => {
+                    updateGenerator.next();
+                }, simulationSpeed);
+                yield;
+            }
+        }
+        updateGenerator = drawState();
+        updateGenerator.next();
+    }
+
     drawPlots(ctx: CanvasRenderingContext2D) {
-        console.log(ctx);
         this.plots.forEach(arrPlot => arrPlot.forEach(item => item.draw(ctx)));
 
     }
     drawMigrants(ctx: CanvasRenderingContext2D) {
         this.migrants.forEach(mig => mig.draw(ctx));
+    }
+
+    getPlot(x: number, y: number): LandPlot {
+        return this.plots[x][y];
     }
 
     private initializePlots() {
@@ -71,8 +96,8 @@ export class LandMigrations {
             if (dx >= alphaFactors.length || dy >= alphaFactors.length)
                 return false;
             else {
-                if (dx > dy) plot.levelResources = alphaFactors[dx] * item.alpha;
-                else plot.levelResources = alphaFactors[dy] * item.alpha;
+                if (dx > dy) plot.levelResources = Math.round(alphaFactors[dx] * item.alpha);
+                else plot.levelResources = Math.round(alphaFactors[dy] * item.alpha);
                 return true;
             }
         });
