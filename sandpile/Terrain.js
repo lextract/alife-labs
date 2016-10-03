@@ -23,11 +23,11 @@ class Terrain {
         }
     }
     initializeColorStates() {
-        this.board.colors.push("#555");
-        this.board.colors.push("#9E99FF");
-        this.board.colors.push("#FF7DCD");
-        this.board.colors.push("#F58814");
-        this.board.colors.push("#f00");
+        this.board.colors.push("#777");
+        this.board.colors.push("#0D3398");
+        this.board.colors.push("#00B500");
+        this.board.colors.push("#e29900");
+        this.board.colors.push("#e20000");
     }
     putGrains(nGrains) {
         let updateGenerator;
