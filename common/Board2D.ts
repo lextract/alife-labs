@@ -9,6 +9,7 @@ export class Board2D {
     private height: number;
     private canvas: HTMLCanvasElement;
     private container: HTMLDivElement;
+    fnFillStyleFinder: (key: string) => string | CanvasGradient | CanvasPattern;
     constructor(
         private containerId: string,
         private xBlocks: number = 1,
@@ -19,12 +20,18 @@ export class Board2D {
         this.container.appendChild(this.canvas);
         this.resetMeasures();
         this.initializeBlocks();
-        window.onresize = ()=>{
+        window.onresize = () => {
             this.resetMeasures();
             this.draw();
         };
     }
 
+    // getFillStyleByKey(key: string): string | CanvasGradient | CanvasPattern {
+    //     return this.fnFillStyle(key);
+    // }
+    // setFillStyleFinder(fn: (string) => string | CanvasGradient | CanvasPattern) {
+    //     this.fnFillStyle = fn;
+    // }
     private initializeBlocks() {
         this.blocks = new Array(this.xBlocks);
         for (let i = 0; i < this.xBlocks; i++) {
@@ -49,6 +56,10 @@ export class Board2D {
 
     }
     draw() {
+        if (!this.fnFillStyleFinder) {
+            console.warn('No yet implemented fnFillStyle on Board2D!');
+            return;
+        }
         let ctx = this.canvas.getContext('2d');
         for (let i = 0; i < this.xBlocks; i++) {
             for (let j = 0; j < this.yBlocks; j++) {

@@ -16,6 +16,12 @@ class Board2D {
             this.draw();
         };
     }
+    // getFillStyleByKey(key: string): string | CanvasGradient | CanvasPattern {
+    //     return this.fnFillStyle(key);
+    // }
+    // setFillStyleFinder(fn: (string) => string | CanvasGradient | CanvasPattern) {
+    //     this.fnFillStyle = fn;
+    // }
     initializeBlocks() {
         this.blocks = new Array(this.xBlocks);
         for (let i = 0; i < this.xBlocks; i++) {
@@ -37,6 +43,10 @@ class Board2D {
         this.heightBlock = this.height / (this.xBlocks + 2);
     }
     draw() {
+        if (!this.fnFillStyleFinder) {
+            console.warn('No yet implemented fnFillStyle on Board2D!');
+            return;
+        }
         let ctx = this.canvas.getContext('2d');
         for (let i = 0; i < this.xBlocks; i++) {
             for (let j = 0; j < this.yBlocks; j++) {

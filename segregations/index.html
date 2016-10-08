@@ -1,0 +1,22 @@
+<!DOCTYPE>
+<html>
+
+<head>
+    <title>Segregations</title>
+    <style>
+        #boardContainer { min-height: 500px; }
+    </style>
+</head>
+
+<body>
+    <div id="boardContainer"></div>
+    <script src="../node_modules/systemjs/dist/system.js"></script>
+    <script> 
+        SystemJS.config({baseURL: './'});
+        SystemJS.import('TestSegregations.js');
+    </script>
+    <input type="number" id="iterations" value="100">
+    <button id="simulateButton">Simulate</button>
+</body>
+
+</html>
