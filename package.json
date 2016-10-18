@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run http-server",
-    "http-server": "http-server -e js -c-1"
+    "http-server": "http-server -p 4477 -e js -c-1"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,9 @@
   },
   "homepage": "https://github.com/lextract/alife-labs#readme",
   "dependencies": {
-    "systemjs": "^0.19.38"
+    "@types/angular": "^1.5.16",
+    "angular": "^1.5.8",
+    "rxjs": "^5.0.0-rc.1",
+    "systemjs": "^0.19.39"
   }
 }

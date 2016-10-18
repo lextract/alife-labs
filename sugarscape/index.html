@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Migrations</title>
+    <style>
+        #canvasContainer { height: 100%; }
+        html,body{height:100%;margin:0;}
+        .allSpace{height:100%;overflow:hidden;position:relative;}
+        .allSpace>div{float:left;display:inline-block;}
+        .allWidth{width:100%;}
+        .width3{width:30%;overflow:auto;height:100%;}
+        .width7{width:70%;}
+        .absButton{position:absolute;top:0;left:0;}
+        input[type=number]{width:50px;}
+	</style>
+</head>
+
+<body ng-app="app">
+	<div class="allSpace" ng-controller="GuiController">
+		<button class="absButton" ng-show="!showedControls" ng-click="showControls(true)">Show controls</button>
+		<div ng-show="showedControls" class="width3">
+			<button ng-click="showControls(false)">Hide controls</button><br>
+			<h3>Land</h3>
+			<label>xSize</label>
+			<input type="number" ng-model="xSize">
+			<label>ySize</label>
+			<input type="number" ng-model="ySize">
+			<br>
+			<button ng-show="!simulating" ng-click="resetLand()">Reset</button>
+			<button ng-show="simulating" ng-click="stopSimulate()">Stop simulation</button>
+			<button ng-show="!simulating" ng-click="simulate()">Simulate</button>
+			<h3>Resoruces</h3>
+			<label>resource growth rate</label>
+			<input type="number" ng-model="resourceGR">
+			<label>pollution growth rate</label>
+			<input type="number" ng-model="pollutionGR">
+			<label>max level</label>
+			<input type="number" ng-model="maxLevelResource">
+			<br>
+			<button ng-click="resourceDefaults()">Set Defaults</button>
+			<br>
+			<label>alpha</label>
+			<input type="number" ng-model="alphaResoruce">
+			<label>x</label>
+			<input type="number" ng-model="xPosResource">
+			<label>y</label>
+			<input type="number" ng-model="yPosResource">
+			<br>
+			<button ng-click="putResources()">Put resources</button>
+			<h3>Migrants</h3>
+			<label>vision</label>
+			<input type="number" ng-model="migrantVision">
+			<label>delta</label>
+			<input type="number" ng-model="deltaVision">
+			<br>
+			<label>metabolism</label>
+			<input type="number" ng-model="metabolism">
+			<label>nibble</label>
+			<input type="number" ng-model="nibbleSize">
+			<br>
+			<label>minEnergy</label>
+			<input type="number" ng-model="minEnergy">
+			<br>
+			<label>maxAge</label>
+			<input type="number" ng-model="maxAge">
+			<label>delta</label>
+			<input type="number" ng-model="deltaMaxAge">
+			<br>
+			<label>population</label>
+			<input type="number" ng-model="population">
+			<label>color</label>
+			<input type="text" ng-model="populationColor">
+			<br>
+			<button ng-click="generateMigrants()">Generate population</button>
+		</div>
+		<div id="canvasContainer" ng-class="canvasClass"></div>
+	</div>
+	<script src="../node_modules/systemjs/dist/system.js"></script>
+
+	<script> 
+        System.config({
+            baseURL: './',
+            paths: {
+                'npm:': '../node_modules/'
+            },
+            map:{
+                'rxjs':'npm:rxjs',
+                'angular':'npm:angular',
+            },
+            packages: {
+                'rxjs': { main: './bundles/Rx.js' },
+                'angular': { main: './angular.min.js' }
+            }
+        });
+        System.import('Main.js');
+    </script>
+
+</body>
+
+</html>
