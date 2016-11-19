@@ -2,15 +2,15 @@ import { LandPlot, PLOT_MEASURES } from './LandPlot.js';
 import { Land, Direction } from './Land.js';
 
 export const MIGRANT_MEASURES = {
-    xCenter : 0,
-    yCenter : 0,
-    radius : 0,
-    xEyeCenter : 0,
-    yEyeCenter : 0,
-    eyeRaduis : 0,
-    startAngle : Math.PI / 12,
-    endAngle : -Math.PI / 6,
-    xGapMouth : 0,
+    xCenter: 0,
+    yCenter: 0,
+    radius: 0,
+    xEyeCenter: 0,
+    yEyeCenter: 0,
+    eyeRaduis: 0,
+    startAngle: Math.PI / 12,
+    endAngle: -Math.PI / 6,
+    xGapMouth: 0,
 }
 
 export class Chromosome {
@@ -35,10 +35,15 @@ export enum TypePerception {
     NEW_PLOT,
     CRASHED
 }
+export enum MigrantCycle {
+    DIE,
+    LIVE,
+    BREED
+}
 export class MigrantAction {
+    targetPlot: LandPlot;
     constructor(
-        public typeAction: TypeAction,
-        public direction?: Direction
+        public typeAction: TypeAction
     ) { }
     //direction: Direction;
 }
@@ -46,7 +51,7 @@ export class MigrantPerception {
     constructor(
         public typePerception: TypePerception
     ) { }
-    //newPlot: LandPlot;
+    newPlot: LandPlot;
     land: Land;
     perimeterPlots: LandPlot[];
 }
@@ -56,58 +61,59 @@ export class Migrant {
     currentPlot: LandPlot;
     color: string;
     constructor(
-        private chromosome: Chromosome
+        private chromosome: Chromosome,
+        private land: Land
     ) {
         this.energy = (chromosome.maxEnergy + chromosome.minEnergy) / 2;
     }
 
     perceive(perception: MigrantPerception): MigrantAction {
-        if (perception.typePerception == TypePerception.NEW_PLOT) {
-            if (this.currentPlot.levelResources > 0) {
-                return new MigrantAction(TypeAction.EAT);
-            }
-            else {
-                let dir = this.findResources(perception.land);
-                if (!dir) dir = this.getRandomDirection(perception.land)
-                if (dir) return new MigrantAction(TypeAction.MOVE, dir);
-                else return new MigrantAction(TypeAction.NONE);
-            }
+        // if (perception.typePerception == TypePerception.NEW_PLOT) {
+
+        // }
+        // else if (perception.typePerception == TypePerception.CRASHED)
+        if (this.currentPlot.levelResources >= this.chromosome.metabolism) {
+            return new MigrantAction(TypeAction.EAT);
         }
-        else if (perception.typePerception == TypePerception.CRASHED) {
-            let dir = this.findResources(perception.land);
-            if (!dir) dir = this.getRandomDirection(perception.land)
-            if (dir) return new MigrantAction(TypeAction.MOVE, dir);
+        else {
+            let nextPlot = this.findResources(this.land);
+            if (!nextPlot) nextPlot = this.getRandomDirection(this.land)
+            if (nextPlot) {
+                let action = new MigrantAction(TypeAction.MOVE);
+                action.targetPlot = nextPlot;
+                return action;
+            }
             else return new MigrantAction(TypeAction.NONE);
         }
     }
-    findResources(land: Land): Direction {
-        let direction: Direction;
+    findResources(land: Land): LandPlot {
+        let result: LandPlot;
         let startDirection = Math.round(Math.random() * 3);
         for (let i = 1; i <= this.chromosome.visionRange; i++) {
             for (let j = 0; j < 4; j++) {
-                direction = (startDirection + j) % 4;
-                let plot = this.getPlot(land, direction, i);
-                if (plot.levelResources > i * this.chromosome.metabolism
-                    && !this.getPlot(land, direction, 1).isBusy
+                let direction = (startDirection + j) % 4;
+                result = this.getPlot(land, direction, 1);
+                if (this.getPlot(land, direction, i).levelResources > i * this.chromosome.metabolism
+                    && !result.isOccupied
                 ) {
                     break;
                 }
-                else direction = undefined;
+                else result = undefined;
             }
-            if (direction) break;
+            if (result) break;
         }
-        return direction;
+        return result;
     }
-    getRandomDirection(land: Land) {
-        let direction: Direction;
+    getRandomDirection(land: Land): LandPlot {
+        let result: LandPlot;
         let startDirection = Math.round(Math.random() * 3);
         for (let j = 0; j < 4; j++) {
-            direction = (startDirection + j) % 4;
-            let plot = this.getPlot(land, direction, 1);
-            if (plot.isBusy) direction = undefined;
+            let direction = (startDirection + j) % 4;
+            result = this.getPlot(land, direction, 1);
+            if (result.isOccupied) result = undefined;
             else break;
         }
-        return direction;
+        return result;
     }
     private getPlot(land: Land, dir: Direction, distance: number): LandPlot {
         let result: LandPlot;
@@ -125,10 +131,13 @@ export class Migrant {
         }
         return result;
     }
-    consumeEnergy() {
+    landCycle(): MigrantCycle {
         this.energy -= this.chromosome.metabolism;
+        if (this.energy < this.chromosome.minEnergy)
+            return MigrantCycle.DIE;
+        else return MigrantCycle.LIVE;
     }
-    get nibbleSize(){
+    get nibbleSize() {
         return this.chromosome.nibbleSize;
     }
     draw(ctx: CanvasRenderingContext2D) {

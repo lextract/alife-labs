@@ -36,10 +36,15 @@ var TypeAction = exports.TypeAction;
     TypePerception[TypePerception["CRASHED"] = 2] = "CRASHED";
 })(exports.TypePerception || (exports.TypePerception = {}));
 var TypePerception = exports.TypePerception;
+(function (MigrantCycle) {
+    MigrantCycle[MigrantCycle["DIE"] = 0] = "DIE";
+    MigrantCycle[MigrantCycle["LIVE"] = 1] = "LIVE";
+    MigrantCycle[MigrantCycle["BREED"] = 2] = "BREED";
+})(exports.MigrantCycle || (exports.MigrantCycle = {}));
+var MigrantCycle = exports.MigrantCycle;
 class MigrantAction {
-    constructor(typeAction, direction) {
+    constructor(typeAction) {
         this.typeAction = typeAction;
-        this.direction = direction;
     }
 }
 exports.MigrantAction = MigrantAction;
@@ -50,67 +55,63 @@ class MigrantPerception {
 }
 exports.MigrantPerception = MigrantPerception;
 class Migrant {
-    constructor(chromosome) {
+    constructor(chromosome, land) {
         this.chromosome = chromosome;
+        this.land = land;
         this.energy = 0;
         this.energy = (chromosome.maxEnergy + chromosome.minEnergy) / 2;
     }
     perceive(perception) {
-        if (perception.typePerception == TypePerception.NEW_PLOT) {
-            if (this.currentPlot.levelResources > 0) {
-                return new MigrantAction(TypeAction.EAT);
-            }
-            else {
-                let dir = this.findResources(perception.land);
-                if (!dir)
-                    dir = this.getRandomDirection(perception.land);
-                if (dir)
-                    return new MigrantAction(TypeAction.MOVE, dir);
-                else
-                    return new MigrantAction(TypeAction.NONE);
-            }
+        // if (perception.typePerception == TypePerception.NEW_PLOT) {
+        // }
+        // else if (perception.typePerception == TypePerception.CRASHED)
+        if (this.currentPlot.levelResources >= this.chromosome.metabolism) {
+            return new MigrantAction(TypeAction.EAT);
         }
-        else if (perception.typePerception == TypePerception.CRASHED) {
-            let dir = this.findResources(perception.land);
-            if (!dir)
-                dir = this.getRandomDirection(perception.land);
-            if (dir)
-                return new MigrantAction(TypeAction.MOVE, dir);
+        else {
+            let nextPlot = this.findResources(this.land);
+            if (!nextPlot)
+                nextPlot = this.getRandomDirection(this.land);
+            if (nextPlot) {
+                let action = new MigrantAction(TypeAction.MOVE);
+                action.targetPlot = nextPlot;
+                return action;
+            }
             else
                 return new MigrantAction(TypeAction.NONE);
         }
     }
     findResources(land) {
-        let direction;
+        let result;
         let startDirection = Math.round(Math.random() * 3);
         for (let i = 1; i <= this.chromosome.visionRange; i++) {
             for (let j = 0; j < 4; j++) {
-                direction = (startDirection + j) % 4;
-                let plot = this.getPlot(land, direction, i);
-                if (plot.levelResources > i * this.chromosome.metabolism
-                    && !this.getPlot(land, direction, 1).isBusy) {
+                let direction = (startDirection + j) % 4;
+                result = this.getPlot(land, direction, 1);
+                if (this.getPlot(land, direction, i).levelResources > i * this.chromosome.metabolism
+                    && !result.isOccupied) {
                     break;
                 }
                 else
-                    direction = undefined;
+                    result = undefined;
             }
-            if (direction)
+            if (result)
                 break;
         }
-        return direction;
+        return result;
     }
     getRandomDirection(land) {
-        let direction;
+        let result;
         let startDirection = Math.round(Math.random() * 3);
         for (let j = 0; j < 4; j++) {
-            direction = (startDirection + j) % 4;
-            let plot = this.getPlot(land, direction, 1);
-            if (plot.isBusy)
-                direction = undefined;
+            let direction = (startDirection + j) % 4;
+            result = this.getPlot(land, direction, 1);
+            if (result.isOccupied)
+                result = undefined;
             else
                 break;
         }
-        return direction;
+        return result;
     }
     getPlot(land, dir, distance) {
         let result;
@@ -128,8 +129,12 @@ class Migrant {
         }
         return result;
     }
-    consumeEnergy() {
+    landCycle() {
         this.energy -= this.chromosome.metabolism;
+        if (this.energy < this.chromosome.minEnergy)
+            return MigrantCycle.DIE;
+        else
+            return MigrantCycle.LIVE;
     }
     get nibbleSize() {
         return this.chromosome.nibbleSize;

@@ -83,13 +83,30 @@ class Land {
         this.simulating = false;
     }
     simulateOneStep() {
+        for (let i = 0; i < this.xPlots; i++) {
+            for (let j = 0; j < this.yPlots; j++) {
+                this.plots[i][j].landCycle();
+            }
+        }
+        for (let i = 0; i < this.xPlots; i++) {
+            for (let j = 0; j < this.yPlots; j++) {
+                this.plots[i][j].strugglePlot();
+            }
+        }
+        for (let k = 0; k < this.population.length; k++) {
+            let cycle = this.population[k].landCycle();
+            if (cycle == Migrant_js_1.MigrantCycle.DIE) {
+                let m = this.population.splice(k, 1);
+                m[0].currentPlot.empty();
+            }
+        }
         this.canvas.draw();
     }
     addResources(alpha, x, y, growthRate, pollutionGrowthRate) {
-        let x1 = x - alphaFactors.length;
-        let x2 = x + alphaFactors.length;
-        let y1 = y - alphaFactors.length;
-        let y2 = y + alphaFactors.length;
+        let x1 = x - alphaFactors.length + 1;
+        let x2 = x + alphaFactors.length - 1;
+        let y1 = y - alphaFactors.length + 1;
+        let y2 = y + alphaFactors.length - 1;
         for (let i = x1; i <= x2; i++) {
             let dx = Math.abs(x - i);
             for (let j = y1; j <= y2; j++) {
@@ -100,9 +117,9 @@ class Land {
             }
         }
     }
-    addMigrants(migrantVision, deltaVision, metabolism, nibbleSize, minEnergy, maxAge, deltaMaxAge, population, populationColor) {
-        for (let i = 0; i < population; i++) {
-            let migrant = new Migrant_js_1.Migrant(new Migrant_js_1.Chromosome(Math.round((migrantVision - deltaVision) + (2 * deltaVision * Math.random())), metabolism, nibbleSize, minEnergy));
+    addMigrants(migrantVision, deltaVision, metabolism, nibbleSize, minEnergy, maxEnergy, maxAge, deltaMaxAge, quantity, populationColor) {
+        for (let i = 0; i < quantity; i++) {
+            let migrant = new Migrant_js_1.Migrant(new Migrant_js_1.Chromosome(Math.round((migrantVision - deltaVision) + (2 * deltaVision * Math.random())), metabolism, nibbleSize, minEnergy, maxEnergy), this);
             migrant.color = populationColor;
             this.population.push(migrant);
             // put on free plot
@@ -112,10 +129,12 @@ class Land {
                 x = Math.floor(Math.random() * this.xPlots);
                 y = Math.floor(Math.random() * this.yPlots);
                 plot = this.plots[x][y];
-            } while (plot.isBusy);
-            migrant.currentPlot = plot;
-            plot.isBusy = true;
+            } while (plot.isOccupied);
+            plot.occupy(migrant);
         }
+    }
+    cleanMigrants() {
+        this.population.splice(0);
     }
 }
 exports.Land = Land;

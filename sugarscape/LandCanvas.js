@@ -26,8 +26,8 @@ class LandCanvas {
         this.canvas.style.height = this.height + 'px';
         LandPlot_js_1.PLOT_MEASURES.width = this.width / this.xBlocks;
         LandPlot_js_1.PLOT_MEASURES.height = this.height / this.yBlocks;
-        Migrant_js_1.MIGRANT_MEASURES.xCenter = LandPlot_js_1.PLOT_MEASURES.width / 3;
-        Migrant_js_1.MIGRANT_MEASURES.yCenter = LandPlot_js_1.PLOT_MEASURES.height / 3;
+        Migrant_js_1.MIGRANT_MEASURES.xCenter = LandPlot_js_1.PLOT_MEASURES.width / 2;
+        Migrant_js_1.MIGRANT_MEASURES.yCenter = LandPlot_js_1.PLOT_MEASURES.height / 2;
         if (Migrant_js_1.MIGRANT_MEASURES.xCenter > Migrant_js_1.MIGRANT_MEASURES.yCenter)
             Migrant_js_1.MIGRANT_MEASURES.radius = Migrant_js_1.MIGRANT_MEASURES.yCenter * .8;
         else

@@ -3,7 +3,6 @@ const Terrain_1 = require('./Terrain');
 let land;
 function testSandpile() {
     land = new Terrain_1.Terrain("boardContainer", 50);
-    //land.putGrains(2000);
     document.getElementById("simulateButton").onclick = simulateClick;
 }
 function simulateClick() {

@@ -2,17 +2,19 @@
 <html>
 
 <head>
+
+
 	<title>Migrations</title>
-    <style>
-        #canvasContainer { height: 100%; }
-        html,body{height:100%;margin:0;}
-        .allSpace{height:100%;overflow:hidden;position:relative;}
-        .allSpace>div{float:left;display:inline-block;}
-        .allWidth{width:100%;}
-        .width3{width:30%;overflow:auto;height:100%;}
-        .width7{width:70%;}
-        .absButton{position:absolute;top:0;left:0;}
-        input[type=number]{width:50px;}
+	<style>
+		#canvasContainer { height: 100%; }
+    html,body{height:100%;margin:0;}
+    .allSpace{height:100%;overflow:hidden;position:relative;}
+    .allSpace>div{float:left;display:inline-block;}
+    .allWidth{width:100%;}
+    .width3{width:30%;overflow:auto;height:100%;}
+    .width7{width:70%;}
+    .absButton{position:absolute;top:0;left:0;}
+    input[type=number]{width:50px;}
 	</style>
 </head>
 
@@ -26,10 +28,13 @@
 			<input type="number" ng-model="xSize">
 			<label>ySize</label>
 			<input type="number" ng-model="ySize">
+			<label>simDelay</label>
+			<input type="number" ng-model="simDelay" ng-change="updateDelay()">
 			<br>
 			<button ng-show="!simulating" ng-click="resetLand()">Reset</button>
 			<button ng-show="simulating" ng-click="stopSimulate()">Stop simulation</button>
 			<button ng-show="!simulating" ng-click="simulate()">Simulate</button>
+			<button ng-show="!simulating" ng-click="simulateStep()">Simulate Step</button>
 			<h3>Resoruces</h3>
 			<label>resource growth rate</label>
 			<input type="number" ng-model="resourceGR">
@@ -38,7 +43,7 @@
 			<label>max level</label>
 			<input type="number" ng-model="maxLevelResource">
 			<br>
-			<button ng-click="resourceDefaults()">Set Defaults</button>
+			<!--<button ng-click="resourceDefaults()">Set Defaults</button>-->
 			<br>
 			<label>alpha</label>
 			<input type="number" ng-model="alphaResoruce">
@@ -61,6 +66,8 @@
 			<br>
 			<label>minEnergy</label>
 			<input type="number" ng-model="minEnergy">
+			<label>maxEnergy</label>
+			<input type="number" ng-model="maxEnergy">
 			<br>
 			<label>maxAge</label>
 			<input type="number" ng-model="maxAge">
@@ -72,7 +79,8 @@
 			<label>color</label>
 			<input type="text" ng-model="populationColor">
 			<br>
-			<button ng-click="generateMigrants()">Generate population</button>
+			<button ng-click="generateMigrants()">Add ({{population}})</button>
+			<button ng-click="cleanMigrants()">Clean population</button>
 		</div>
 		<div id="canvasContainer" ng-class="canvasClass"></div>
 	</div>

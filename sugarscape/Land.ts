@@ -1,6 +1,6 @@
 import { LandCanvas } from './LandCanvas.js';
 import { LandPlot } from './LandPlot.js';
-import { Migrant, Chromosome } from './Migrant.js';
+import { Migrant, Chromosome, MigrantPerception, TypePerception, MigrantCycle } from './Migrant.js';
 
 const alphaFactors = [1, 0.9, 0.7, 0.4, 0.1];
 
@@ -83,13 +83,30 @@ export class Land {
         this.simulating = false;
     }
     simulateOneStep() {
+        for (let i = 0; i < this.xPlots; i++) {
+            for (let j = 0; j < this.yPlots; j++) {
+                this.plots[i][j].landCycle();
+            }
+        }
+        for (let i = 0; i < this.xPlots; i++) {
+            for (let j = 0; j < this.yPlots; j++) {
+                this.plots[i][j].strugglePlot();
+            }
+        }
+        for (let k = 0; k < this.population.length; k++) {
+            let cycle = this.population[k].landCycle();
+            if (cycle == MigrantCycle.DIE) {
+                let m = this.population.splice(k, 1);
+                m[0].currentPlot.empty();
+            }
+        }
         this.canvas.draw();
     }
     addResources(alpha: number, x: number, y: number, growthRate?: number, pollutionGrowthRate?: number) {
-        let x1 = x - alphaFactors.length;
-        let x2 = x + alphaFactors.length;
-        let y1 = y - alphaFactors.length;
-        let y2 = y + alphaFactors.length;
+        let x1 = x - alphaFactors.length + 1;
+        let x2 = x + alphaFactors.length - 1;
+        let y1 = y - alphaFactors.length + 1;
+        let y2 = y + alphaFactors.length - 1;
         for (let i = x1; i <= x2; i++) {
             let dx = Math.abs(x - i);
             for (let j = y1; j <= y2; j++) {
@@ -103,14 +120,14 @@ export class Land {
     addMigrants(
         migrantVision: number, deltaVision: number,
         metabolism: number, nibbleSize: number,
-        minEnergy: number, maxAge: number, deltaMaxAge: number,
-        population: number, populationColor: string
+        minEnergy: number, maxEnergy: number, maxAge: number, deltaMaxAge: number,
+        quantity: number, populationColor: string
     ) {
-        for (let i = 0; i < population; i++) {
+        for (let i = 0; i < quantity; i++) {
             let migrant = new Migrant(new Chromosome(
                 Math.round((migrantVision - deltaVision) + (2 * deltaVision * Math.random())),
-                metabolism, nibbleSize, minEnergy
-            ));
+                metabolism, nibbleSize, minEnergy, maxEnergy
+            ), this);
             migrant.color = populationColor;
             this.population.push(migrant);
             // put on free plot
@@ -121,11 +138,12 @@ export class Land {
                 y = Math.floor(Math.random() * this.yPlots);
                 plot = this.plots[x][y];
             }
-            while (plot.isBusy)
-            migrant.currentPlot = plot;
-            plot.isBusy = true;
+            while (plot.isOccupied)
+            plot.occupy(migrant);
         }
     }
-
+    cleanMigrants() {
+        this.population.splice(0);
+    }
 
 }

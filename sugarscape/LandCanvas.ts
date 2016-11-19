@@ -33,8 +33,8 @@ export class LandCanvas {
         this.canvas.style.height = this.height + 'px';
         PLOT_MEASURES.width = this.width / this.xBlocks;
         PLOT_MEASURES.height = this.height / this.yBlocks;
-        MIGRANT_MEASURES.xCenter = PLOT_MEASURES.width / 3;
-        MIGRANT_MEASURES.yCenter = PLOT_MEASURES.height / 3;
+        MIGRANT_MEASURES.xCenter = PLOT_MEASURES.width / 2;
+        MIGRANT_MEASURES.yCenter = PLOT_MEASURES.height / 2;
         if (MIGRANT_MEASURES.xCenter > MIGRANT_MEASURES.yCenter)
             MIGRANT_MEASURES.radius = MIGRANT_MEASURES.yCenter * .8;
         else MIGRANT_MEASURES.radius = MIGRANT_MEASURES.xCenter * .8;
