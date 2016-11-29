@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Reaction-Diffusion</title>
+  <style>
+    html,body{height:100%;margin:0;}
+    .allSpace{position: relative;}
+    .allSpace>div{float: left;width: 50%;height: 520px;}
+  </style>
+</head>
+
+<body ng-app="app">
+  <div class="allSpace" ng-controller="GuiController">
+    
+    <div id="canvasContainer"></div>
+    <div id="controlsContainer">
+      <label>iterations</label>
+			<input type="number" ng-model="iterations" disabled>
+      <br>
+      <label>feedRate</label>
+			<input type="number" ng-model="feedRate" ng-change="feedRateUpdate()">
+			<br>
+      <label>killRate</label>
+			<input type="number" ng-model="killRate" ng-change="killRateUpdate()">
+			<br>
+      <label>difussionRateA</label>
+			<input type="number" ng-model="difussionRateA" ng-change="difussionRateAUpdate()">
+			<br>
+      <label>difussionRateB</label>
+			<input type="number" ng-model="difussionRateB" ng-change="difussionRateBUpdate()">
+			<br>
+      <label>Simulation Delay</label>
+			<input type="number" ng-model="simDelay" ng-change="updateDelay()">
+			<br>
+			<br>
+      <button ng-show="!simulating" ng-click="reset()">Reset</button>
+			<button ng-show="simulating" ng-click="stopSimulate()">Stop simulation</button>
+			<button ng-show="!simulating" ng-click="simulate()">Simulate</button>
+    </div>
+  </div>
+  <script src="../node_modules/systemjs/dist/system.js"></script>
+
+  <script> 
+    System.config({
+      baseURL: './',
+      paths: {
+          'npm:': '../node_modules/'
+      },
+      map:{
+          'angular':'npm:angular',
+      },
+      packages: {
+          'angular': { main: './angular.min.js' }
+      }
+    });
+    System.import('Main.js');
+  </script>
+</body>
+
+</html>
